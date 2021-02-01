@@ -11,10 +11,10 @@ public class GameController : MonoBehaviour
     List<GameObject> enemyList = new List<GameObject>();
 
     public List<GameObject> enemyMissileList = new List<GameObject>();
-    
+
     public Material[] Material = new Material[2];// Material[0] = black , Material[1] = red;
-    
-    
+
+
 
 
     public PlayerController plCon;
@@ -28,7 +28,7 @@ public class GameController : MonoBehaviour
     private void CreateEnemy(List<GameObject> enemyList){
         Vector3 enPos = new Vector3(Random.Range(-2.0f,2.0f),5,0);
         enemyList.Add(Instantiate(enemy,enPos,Quaternion.Euler(90f,0,0)));
-        for(int i = enemyList.Count - 1; i > -1; i--) 
+        for(int i = enemyList.Count - 1; i > -1; i--)
       {
         if (enemyList[i] == null){enemyList.RemoveAt(i);}
       }
@@ -39,7 +39,7 @@ public class GameController : MonoBehaviour
    //Function for hit judgment
    //CollisionDetection(attacked things,attacker,Type of attack)
    //Currently, the missile and player hit judgment does not work, so other programs are used instead. Cause unknown. (study)
-   
+
    　private void CollisionDetection(List<GameObject> enemyList,List<GameObject> missileList,string target){
        for (int i= enemyList.Count-1; i>-1; i--){
            if(enemyList[i] != null){
@@ -75,7 +75,7 @@ public class GameController : MonoBehaviour
    }
 
    //---------------------------------------------------------------------------------------------------------------
-   
+
    // Playre color change
    private void CollisionColorChange(GameObject target,Material color){
        for (int i =0; i<3; i++){
@@ -88,6 +88,7 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("シフトでミサイル発射、マウスで移動");
         timeElapsed = 0.0f;
         timeOut = 1.0f;
         colorChangeTimeElapsed = 0.0f;
@@ -100,26 +101,26 @@ public class GameController : MonoBehaviour
     {
         plCon = player.GetComponent<PlayerController>();
         List<GameObject> missileList = plCon.missileList; // Player's missile
-        
+
         // Setting CreateEnemy interval
         timeElapsed += Time.deltaTime;
         if(timeElapsed >= timeOut){
             CreateEnemy(enemyList);
             timeElapsed = 0.0f;
         }
-        
+
         // collision detection (Player's missile => enemy and Player <=> enemy)
         CollisionDetection(enemyList,missileList,"enemy");
         //CollisionDetection(playerList,enemyMissileList,"player");
         CollisionDetection(playerList,enemyList,"P&E");
-        
+
         // red => black interval
         colorChangeTimeElapsed += Time.deltaTime;
         if(colorChangeTimeElapsed >= colorChangeTime){
-            CollisionColorChange(player,Material[0]); 
+            CollisionColorChange(player,Material[0]);
             colorChangeTimeElapsed = 0.0f;
         }
-        
+
 
     }
 }
