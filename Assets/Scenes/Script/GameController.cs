@@ -88,7 +88,7 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("シフトでミサイル発射、マウスで移動");
+        Debug.Log("スペースキーでミサイル発射、マウスで移動");
         timeElapsed = 0.0f;
         timeOut = 1.0f;
         colorChangeTimeElapsed = 0.0f;
