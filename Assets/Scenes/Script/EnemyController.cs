@@ -45,12 +45,12 @@ public class EnemyController : MonoBehaviour
     void Update()
     {
         //enemy Destroy
-        if(HP<=0 || this.transform.position.y < -10){
+        if(HP<=0 || this.transform.position.z < -10){
             Destroy(this.gameObject);
         }
         
         //Calculation of enemy position (flaot * Vector3)
-         this.transform.position += speed * new Vector3(0.0f,-1.0f,0.0f);
+        this.transform.position += speed * new Vector3(0.0f,0.0f,-1.0f);
 
         // create missile interval
          timeElapsed += Time.deltaTime;

@@ -26,8 +26,8 @@ public class GameController : MonoBehaviour
 
     //CreateEnemy
     private void CreateEnemy(List<GameObject> enemyList){
-        Vector3 enPos = new Vector3(Random.Range(-2.0f,2.0f),5,0);
-        enemyList.Add(Instantiate(enemy,enPos,Quaternion.Euler(90f,0,0)));
+        Vector3 enPos = new Vector3(Random.Range(-2.0f,2.0f),0,5);
+        enemyList.Add(Instantiate(enemy,enPos,Quaternion.Euler(0,180,0)));
         for(int i = enemyList.Count - 1; i > -1; i--)
       {
         if (enemyList[i] == null){enemyList.RemoveAt(i);}
@@ -88,7 +88,7 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("スペースキーでミサイル発射、マウスで移動");
+        Debug.Log("シフトでミサイル発射、マウスで移動");
         timeElapsed = 0.0f;
         timeOut = 1.0f;
         colorChangeTimeElapsed = 0.0f;
@@ -120,7 +120,5 @@ public class GameController : MonoBehaviour
             CollisionColorChange(player,Material[0]);
             colorChangeTimeElapsed = 0.0f;
         }
-
-
     }
 }
