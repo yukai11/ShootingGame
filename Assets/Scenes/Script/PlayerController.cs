@@ -6,36 +6,41 @@ public class PlayerController : MonoBehaviour
 {
   private const float c_fPlSpeedMove = 0.1f; //if player move, player speed
   private const float c_fPlSpeedStop = 0.0f; //if player stop, player speed
+  private const float c_fDeltaAngle = 10f;
+  
+  private  Vector2 m_vMovableRangeX = new Vector2(-2,2); // Define the area which player can move (Coordinate　X)
+  private  Vector2 m_vMovableRangeZ = new Vector2(-4,4);// Define the area which player can move (Coordinate　Z)
+  private const float c_fElasticityMagnitude = 0.1f;
 
-  private float fTimeElapsed; //Elapsed time since shooting missiles
-  public  float fTimeOut = 0.5f; //shooting missiles interval
+  private float m_fTimeElapsed; //Elapsed time since shooting missiles
+  public  float m_fTimeOut = 0.5f; //shooting missiles interval
 
-  private Vector3 plPos; // Define player position
-  private Vector3 mousePos; // Define player position
-  private float plSpeed; // Define player speed
+  private Vector3 m_vPlPos; // Define player position
+  //private Vector3 mousePos; // Define player position
+  public float m_fPlSpeed = 0.1f; // Define player speed
 
   // PLayer's missile
   public GameObject missile;
-  public List<GameObject> missileList = new List<GameObject>();
+  public List<GameObject> m_pMissileList = new List<GameObject>();
   
   
-  public int HP; //Player's HP
-  private Vector3 plDirection;
+  public int m_sHP; //Player's m_sHP
+  private Vector3 m_vPlDirection; // player direction
 
   
 
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    //This function is to shoot a missile and control missils
-    //plPos is player Position
+    //@Brief : This function is to shoot a missile and control missils
+    //vPlPos is player Position
     //missile is missile GameObject
-    private void ShootingMissile(GameObject player,GameObject missile,List<GameObject> missileList){
-      Vector3 plPos = player.transform.position;
-      GameObject　ms = Instantiate(missile,plPos,Quaternion.identity,player.transform);
-      missileList.Add(ms);
-      for(int i = missileList.Count - 1; i > -1; i--) // clean missileList
+    private void _ShootingMissile(GameObject player,GameObject missile,List<GameObject> m_pMissileList){
+      Vector3 vPlPos = player.transform.position;
+      GameObject　ms = Instantiate(missile,vPlPos,Quaternion.identity,player.transform);
+      m_pMissileList.Add(ms);
+      for(int i = m_pMissileList.Count - 1; i > -1; i--) // clean m_pMissileList
       {
-        if (missileList[i] == null){missileList.RemoveAt(i);}
+        if (m_pMissileList[i] == null){m_pMissileList.RemoveAt(i);}
       }
     }
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -43,15 +48,18 @@ public class PlayerController : MonoBehaviour
 
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    private void UseMousePosition(Vector3 plPos){
+    //@Brief : The mouse control player's direction
+    //
+    //
+    private void _UseMousePosition(Vector3 m_vPlPos){
       // mouse position change screen to world point
-      mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-      mousePos.y=0;
-      plDirection = (mousePos-plPos).normalized; //Player direction
-      if((mousePos-plPos).magnitude<0.1f){
-        plSpeed = c_fPlSpeedStop;
+      Vector3 vMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+      vMousePos.y=0;
+      m_vPlDirection = (vMousePos-m_vPlPos).normalized; //Player direction
+      if((vMousePos-m_vPlPos).magnitude<0.1f){
+        m_fPlSpeed = c_fPlSpeedStop;
       }else{
-        plSpeed = c_fPlSpeedMove;
+        m_fPlSpeed = c_fPlSpeedMove;
       }
     }
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -59,64 +67,67 @@ public class PlayerController : MonoBehaviour
 
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    private void UseKeyBoardPosition(){
-      plSpeed = c_fPlSpeedStop;
+    //@Brief : using keyboard can control player direction
+    private void _UseKeyBoardPosition(){
+      m_fPlSpeed = c_fPlSpeedStop;
       if(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)){
-        plSpeed = c_fPlSpeedMove;
-        plDirection = new Vector3(Mathf.Sin(Mathf.PI*this.transform.eulerAngles.y/180),0,Mathf.Cos(Mathf.PI*this.transform.eulerAngles.y/180)).normalized;
+        m_fPlSpeed = c_fPlSpeedMove;
+        m_vPlDirection = new Vector3(Mathf.Sin(Mathf.PI*this.transform.eulerAngles.y/180),0,Mathf.Cos(Mathf.PI*this.transform.eulerAngles.y/180)).normalized;
       }
-      //Below code do not use
+      //Below code do not use (use now)
       //It is because real jet cannot move back direction
-      /*if(Input.GetKey(KeyCode.S)|| Input.GetKey(KeyCode.DownArrow)){
-        plSpeed = c_fPlSpeedMove;
-        plDirection = new Vector3(Mathf.Sin(-Mathf.PI*this.transform.eulerAngles.y/180),0,-Mathf.Cos(Mathf.PI*this.transform.eulerAngles.y/180)).normalized;
-      }*/
+      if(Input.GetKey(KeyCode.S)|| Input.GetKey(KeyCode.DownArrow)){
+        m_fPlSpeed = c_fPlSpeedMove;
+        m_vPlDirection = new Vector3(Mathf.Sin(-Mathf.PI*this.transform.eulerAngles.y/180),0,-Mathf.Cos(Mathf.PI*this.transform.eulerAngles.y/180)).normalized;
+      }
     }
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    private void MovableRange(Vector3 plPos){
-      //　Setting the movable area of the player
-      if(plPos.z>4){this.transform.position += new Vector3(0,0,-0.1f);}
-      if(plPos.z<-4){this.transform.position += new Vector3(0,0,0.1f);}
-      if(plPos.x>2){this.transform.position += new Vector3(-0.1f,0,0);}
-      if(plPos.x<-2){this.transform.position += new Vector3(0.1f,0,0);}
+    //　@Brife : Setting the movable area of the player
+    private void _MovableRange(Vector3 m_vPlPos){
+      if(m_vPlPos.z>m_vMovableRangeZ.x){this.transform.position += new Vector3(0,0,-c_fElasticityMagnitude);}
+      if(m_vPlPos.z<m_vMovableRangeZ.y){this.transform.position += new Vector3(0,0,c_fElasticityMagnitude);}
+      if(m_vPlPos.x>m_vMovableRangeX.x){this.transform.position += new Vector3(-c_fElasticityMagnitude,0,0);}
+      if(m_vPlPos.x<m_vMovableRangeX.y){this.transform.position += new Vector3(c_fElasticityMagnitude,0,0);}
     }
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    private void RotationPlayerUseMouse(){
-      float s_fDot = Vector3.Dot(plDirection,new Vector3(0,0,1));
-      float s_fAngle = 0;
-      if(plDirection.x<=0){
-          s_fAngle = -180 * Mathf.Acos(s_fDot) / Mathf.PI;
+    //@Brife : using mouse control player's rotarion
+    private void _RotationPlayerUseMouse(){
+      float fDot = Vector3.Dot(m_vPlDirection,new Vector3(0,0,1));
+      float fAngle = 0;
+      if(m_vPlDirection.x<=0){
+          fAngle = -180 * Mathf.Acos(fDot) / Mathf.PI;
         }else{
-          s_fAngle = 180 * Mathf.Acos(s_fDot) / Mathf.PI;
+          fAngle = 180 * Mathf.Acos(fDot) / Mathf.PI;
         }
-      this.transform.eulerAngles = new Vector3(0,s_fAngle,0);
+      this.transform.eulerAngles = new Vector3(0,fAngle,0);
     }
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    private void RotationPlayerUseKeyBoard(){
-      float s_fAngle = this.transform.eulerAngles.y;
-        if(Input.GetKey(KeyCode.D)|| Input.GetKey(KeyCode.RightArrow)){s_fAngle += 10;}
-        if(Input.GetKey(KeyCode.A)|| Input.GetKey(KeyCode.LeftArrow)){s_fAngle -= 10;}
-      this.transform.eulerAngles = new Vector3(0,s_fAngle,0);
+    //@Brife : using keyboard control player's rotarion
+    private void _RotationPlayerUseKeyBoard(){
+      float fAngle = this.transform.eulerAngles.y;
+        if(Input.GetKey(KeyCode.D)|| Input.GetKey(KeyCode.RightArrow)){fAngle += c_fDeltaAngle;}
+        if(Input.GetKey(KeyCode.A)|| Input.GetKey(KeyCode.LeftArrow)){fAngle -= c_fDeltaAngle;}
+      this.transform.eulerAngles = new Vector3(0,fAngle,0);
     }
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    private void GameOver(){
-      if(HP<=0){
+    private void _GameOver(){
+      if(m_sHP<=0){
         Debug.Log("GameOver");
       }
     }
@@ -126,30 +137,30 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-      plPos = new Vector3(0,0,0); //Setting player position
-      plSpeed = 0.2f;
-      fTimeElapsed = 0.0f;
-      HP =10;
+      Application.targetFrameRate = 60;
+      //m_vPlPos = new Vector3(0,0,0); //Setting player position
+      //m_fTimeElapsed = 0.0f;
+      m_sHP =10;
     }
 
     public void PlayerControllerUpdate(){
-      plPos = this.transform.position;
-      //UseMousePosition(plPos);//create player speed
-      UseKeyBoardPosition();
+      m_vPlPos = this.transform.position;
+      //_UseMousePosition(m_vPlPos);//create player speed
+      _UseKeyBoardPosition();
       // Adjusting missile launch intervals
-      fTimeElapsed += Time.deltaTime;
+      m_fTimeElapsed += Time.deltaTime;
       if (Input.GetKey(KeyCode.Space)){
-        if(fTimeElapsed >= fTimeOut){
-            ShootingMissile(this.gameObject,missile,missileList);
-            fTimeElapsed = 0.0f;
+        if(m_fTimeElapsed >= m_fTimeOut){
+            _ShootingMissile(this.gameObject,missile,m_pMissileList);
+            m_fTimeElapsed = 0.0f;
         }
       }
       //Calculation of player position (flaot * Vector3)
-      this.transform.position += plSpeed*plDirection; //　decision player position
-      //RotationPlayerUseMouse(); //Change direction of player
-      RotationPlayerUseKeyBoard();
-      MovableRange(plPos); //Define Movable range
-      GameOver(); //game over message
+      this.transform.position += m_fPlSpeed*m_vPlDirection; //　decision player position
+      //_RotationPlayerUseMouse(); //Change direction of player
+      _RotationPlayerUseKeyBoard();
+      _MovableRange(m_vPlPos); //Define Movable range
+      _GameOver(); //game over message
     }
 
 

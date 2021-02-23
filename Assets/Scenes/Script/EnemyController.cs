@@ -4,23 +4,25 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    public int HP; // enemy's HP
-    public float speed=0.05f;
+    public int m_sHP; // enemy's m_sHP
+    public float m_fSpeed=0.05f;
     public GameObject missile;
-    public List<GameObject> enemyMissileList = new List<GameObject>();
+    public List<GameObject> m_pEnemyMissileList = new List<GameObject>();
 
-    private float timeElapsed;
-    private float timeOut;
+    public Vector3 m_vEnemeyDirection;
+    public float m_fTimeElapsed = 0.0f;
+    public float m_fTimeOut = 1.0f;
     
     //----------------------------
     // Not in use
     public GameController gmCon;
-    public GameObject world;
     //----------------------------
+    public GameObject world;
     
     
-    // create missile
-    private void attackPlayer(GameObject enemy,GameObject missile,List<GameObject> enemyMissileList){
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //　@Brife : create missile
+    private void _AttackPlayer(GameObject enemy,GameObject missile,List<GameObject> enemyMissileList){
       Vector3 enPos = enemy.transform.position;
       GameObject　ms = Instantiate(missile,enPos,Quaternion.identity,enemy.transform);
       enemyMissileList.Add(ms);
@@ -29,34 +31,37 @@ public class EnemyController : MonoBehaviour
         if (enemyMissileList[i] == null){enemyMissileList.RemoveAt(i);}
       }
     }
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     
     
+
     void Start()
     {
-        enemyMissileList = world.GetComponent<GameController>().enemyMissileList;
-        HP = 1;
+        m_pEnemyMissileList = world.GetComponent<GameController>().m_pEnemyMissileList;
+        m_sHP = 1;
         //this.transform.position = new Vector3(0,5,0); //setting first position
-        attackPlayer(this.gameObject,missile,enemyMissileList);
-        timeElapsed = 0.0f;
-        timeOut = 1.0f;
+        _AttackPlayer(this.gameObject,missile,m_pEnemyMissileList);
+    }
+
+    public void EnemyControllerUpdate(){
+      //enemy Destroy
+        if(m_sHP<=0 || this.transform.position.z < -10){
+            Destroy(this.gameObject);
+        }
+        //Calculation of enemy position (flaot * Vector3)
+        this.transform.position += m_fSpeed * m_vEnemeyDirection;
+
+        // create missile interval
+         m_fTimeElapsed += Time.deltaTime;
+         if(m_fTimeElapsed >= m_fTimeOut){
+            _AttackPlayer(this.gameObject,missile,m_pEnemyMissileList);
+            m_fTimeElapsed=0.0f;
+           }
     }
 
     // Update is called once per frame
     void Update()
     {
-        //enemy Destroy
-        if(HP<=0 || this.transform.position.z < -10){
-            Destroy(this.gameObject);
-        }
-        
-        //Calculation of enemy position (flaot * Vector3)
-        this.transform.position += speed * new Vector3(0.0f,0.0f,-1.0f);
-
-        // create missile interval
-         timeElapsed += Time.deltaTime;
-         if(timeElapsed >= timeOut){
-            attackPlayer(this.gameObject,missile,enemyMissileList);
-            timeElapsed=0.0f;
-            }
+      EnemyControllerUpdate();
     }
 }
