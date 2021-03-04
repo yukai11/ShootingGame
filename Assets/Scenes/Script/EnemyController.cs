@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
+    private const float c_fDestroyArea = -10.0f;
     public int m_sHP; // enemy's m_sHP
     public float m_fSpeed=0.05f;
     public GameObject missile;
@@ -22,13 +23,13 @@ public class EnemyController : MonoBehaviour
     
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //　@Brife : create missile
-    private void _AttackPlayer(GameObject enemy,GameObject missile,List<GameObject> enemyMissileList){
+    private void _AttackPlayer(GameObject enemy,GameObject missile,List<GameObject> pEnemyMissileList){
       Vector3 enPos = enemy.transform.position;
       GameObject　ms = Instantiate(missile,enPos,Quaternion.identity,enemy.transform);
-      enemyMissileList.Add(ms);
-      for(int i = enemyMissileList.Count - 1; i > -1; i--)
+      pEnemyMissileList.Add(ms);
+      for(int i = pEnemyMissileList.Count - 1; i > -1; i--)
       {
-        if (enemyMissileList[i] == null){enemyMissileList.RemoveAt(i);}
+        if (pEnemyMissileList[i] == null){pEnemyMissileList.RemoveAt(i);}
       }
     }
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -45,7 +46,7 @@ public class EnemyController : MonoBehaviour
 
     public void EnemyControllerUpdate(){
       //enemy Destroy
-        if(m_sHP<=0 || this.transform.position.z < -10){
+        if(m_sHP<=0 || this.transform.position.z < c_fDestroyArea){
             Destroy(this.gameObject);
         }
         //Calculation of enemy position (flaot * Vector3)

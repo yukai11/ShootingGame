@@ -15,8 +15,6 @@ public class GameController : MonoBehaviour
     public Material[] m_pMaterial = new Material[2];// Material[0] = black , Material[1] = red;
 
 
-
-
     public PlayerController plCon;
     public EnemyController EnCon;
 
@@ -25,13 +23,15 @@ public class GameController : MonoBehaviour
     private float m_fColorChangeTime;
     private float m_fColorChangeTimeElapsed;
 
+    
+
     //CreateEnemy
-    private void CreateEnemy(List<GameObject> enemyList){
+    private void _CreateEnemy(List<GameObject> pEnemyList){
         Vector3 enPos = new Vector3(Random.Range(-2.0f,2.0f),0,5);
-        enemyList.Add(Instantiate(enemy,enPos,Quaternion.Euler(0,180,0)));
-        for(int i = enemyList.Count - 1; i > -1; i--)
+        pEnemyList.Add(Instantiate(enemy,enPos,Quaternion.Euler(0,180,0)));
+        for(int i = pEnemyList.Count - 1; i > -1; i--)
       {
-        if (enemyList[i] == null){enemyList.RemoveAt(i);}
+        if (pEnemyList[i] == null){pEnemyList.RemoveAt(i);}
       }
     }
 
@@ -41,19 +41,19 @@ public class GameController : MonoBehaviour
    //CollisionDetection(attacked things,attacker,Type of attack)
    //Currently, the missile and player hit judgment does not work, so other programs are used instead. Cause unknown. (study)
 
-   　private void CollisionDetection(List<GameObject> enemyList,List<GameObject> missileList,string target){
+   　private void _CollisionDetection(List<GameObject> enemyList,List<GameObject> pMissileList,string pTarget){
        for (int i= enemyList.Count-1; i>-1; i--){
            if(enemyList[i] != null){
                Vector3 enemyPos = enemyList[i].transform.position;
-               for(int k= missileList.Count-1; k>-1; k--){
-                   if(missileList[k] != null){
-                       Vector3 missilePos = missileList[k].transform.position;
+               for(int k= pMissileList.Count-1; k>-1; k--){
+                   if(pMissileList[k] != null){
+                       Vector3 missilePos = pMissileList[k].transform.position;
                        float distance = (enemyPos - missilePos).magnitude;  // distance is length  which enemy from missile.
-                       if (distance<1.0f && target=="enemy"){
+                       if (distance<1.0f && pTarget=="enemy"){
                            EnCon = enemyList[i].GetComponent<EnemyController>();
                            EnCon.m_sHP -= 1;
-                           Destroy(missileList[k]);
-                       }else if(distance<1.0f && target=="player"){
+                           Destroy(pMissileList[k]);
+                       }else if(distance<1.0f && pTarget=="player"){
                         //instead of Collision Enemy Missile
 
                           /* plCon = enemyList[i].GetComponent<PlayerController>();
@@ -61,13 +61,13 @@ public class GameController : MonoBehaviour
                            Debug.Log("プレイヤーのHPを表示しますA");
                            Debug.Log(plCon.m_sHP);
                            CollisionColorChange(enemyList[i],m_pMaterial[1]);
-                           Destroy(missileList[k]);*/
-                       }else if(distance<0.5f && target=="P&E"){
+                           Destroy(pMissileList[k]);*/
+                       }else if(distance<0.5f && pTarget=="P&E"){
                            plCon = enemyList[i].GetComponent<PlayerController>();
-                           EnCon = missileList[k].GetComponent<EnemyController>();
+                           EnCon = pMissileList[k].GetComponent<EnemyController>();
                            plCon.m_sHP -= 1;
                            EnCon.m_sHP -= 1;
-                           CollisionColorChange(enemyList[i],m_pMaterial[1]);
+                           _CollisionColorChange(enemyList[i],m_pMaterial[1]);
                            Debug.Log("プレイヤーのHPを表示します");
                            Debug.Log(plCon.m_sHP);
                        }
@@ -80,7 +80,7 @@ public class GameController : MonoBehaviour
    //---------------------------------------------------------------------------------------------------------------
 
    // Playre color change
-   private void CollisionColorChange(GameObject target,Material color){
+   private void _CollisionColorChange(GameObject target,Material color){
        for (int i =0; i<3; i++){
            target.transform.GetChild(i).GetComponent<Renderer>().material= color;
        }
@@ -99,29 +99,34 @@ public class GameController : MonoBehaviour
         m_pPlayerList.Add(player);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
+    public void GameControllerUpdate(){
         plCon = player.GetComponent<PlayerController>();
-        List<GameObject> missileList = plCon.m_pMissileList; // Player's missile
+        List<GameObject> pMissileList = plCon.m_pMissileList; // Player's missile
 
         // Setting CreateEnemy interval
         m_fTimeElapsed += Time.deltaTime;
         if(m_fTimeElapsed >= m_fTimeOut){
-            CreateEnemy(m_pEnemyList);
+            _CreateEnemy(m_pEnemyList);
             m_fTimeElapsed = 0.0f;
         }
+        
 
         // collision detection (Player's missile => enemy and Player <=> enemy)
-        CollisionDetection(m_pEnemyList,missileList,"enemy");
+        _CollisionDetection(m_pEnemyList,pMissileList,"enemy");
         //CollisionDetection(m_pPlayerList,m_pEnemyMissileList,"player");
-        CollisionDetection(m_pPlayerList,m_pEnemyList,"P&E");
+        _CollisionDetection(m_pPlayerList,m_pEnemyList,"P&E");
 
         // red => black interval
         m_fColorChangeTimeElapsed += Time.deltaTime;
         if(m_fColorChangeTimeElapsed >= m_fColorChangeTime){
-            CollisionColorChange(player,m_pMaterial[0]);
+            _CollisionColorChange(player,m_pMaterial[0]);
             m_fColorChangeTimeElapsed = 0.0f;
-        }
+            }
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        GameControllerUpdate();
     }
 }

@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
 {
   private const float c_fPlSpeedMove = 0.1f; //if player move, player speed
   private const float c_fPlSpeedStop = 0.0f; //if player stop, player speed
-  private const float c_fDeltaAngle = 10f;
+  private const float c_fDeltaAngle = 3.0f;
   
   private  Vector2 m_vMovableRangeX = new Vector2(-2,2); // Define the area which player can move (Coordinate　X)
   private  Vector2 m_vMovableRangeZ = new Vector2(-4,4);// Define the area which player can move (Coordinate　Z)
@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
 
   private Vector3 m_vPlPos; // Define player position
   //private Vector3 mousePos; // Define player position
-  public float m_fPlSpeed = 0.1f; // Define player speed
+  public float m_fPlSpeed; // Define player speed
 
   // PLayer's missile
   public GameObject missile;
@@ -34,29 +34,50 @@ public class PlayerController : MonoBehaviour
     //@Brief : This function is to shoot a missile and control missils
     //vPlPos is player Position
     //missile is missile GameObject
-    private void _ShootingMissile(GameObject player,GameObject missile,List<GameObject> m_pMissileList){
+    private void _ShootingMissile(GameObject player,GameObject missile,List<GameObject> pMissileList){
       Vector3 vPlPos = player.transform.position;
       GameObject　ms = Instantiate(missile,vPlPos,Quaternion.identity,player.transform);
-      m_pMissileList.Add(ms);
-      for(int i = m_pMissileList.Count - 1; i > -1; i--) // clean m_pMissileList
+      pMissileList.Add(ms);
+      for(int i = pMissileList.Count - 1; i > -1; i--) // clean m_pMissileList
       {
-        if (m_pMissileList[i] == null){m_pMissileList.RemoveAt(i);}
+        if (pMissileList[i] == null){pMissileList.RemoveAt(i);}
       }
     }
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+　　//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //@Brief : This function is to shoot a missile and control missils
+    //vPlPos is player Position
+    //missile is missile GameObject
+    private void _ShootingMissileType2(GameObject player,GameObject missile,List<GameObject> pMissileList,string pType){
+      Vector3 vPlPos = player.transform.position;
+      if(pType=="normal"){
+      GameObject　ms = Instantiate(missile,vPlPos,Quaternion.identity,player.transform);
+      pMissileList.Add(ms);
+      }else if(pType=="double"){
+          GameObject ms1 = Instantiate(missile,vPlPos+new Vector3(-vPlPos.z,vPlPos.y,vPlPos.x).normalized,Quaternion.identity,player.transform);
+          GameObject ms2 = Instantiate(missile,vPlPos+new Vector3(vPlPos.z,vPlPos.y,-vPlPos.x).normalized,Quaternion.identity,player.transform);
+          pMissileList.Add(ms1);
+          pMissileList.Add(ms2);
+      }
+      for(int i = pMissileList.Count - 1; i > -1; i--) // clean m_pMissileList
+      {
+        if (pMissileList[i] == null){pMissileList.RemoveAt(i);}
+        }
+    }
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //@Brief : The mouse control player's direction
     //
     //
-    private void _UseMousePosition(Vector3 m_vPlPos){
+    private void _UseMousePosition(Vector3 vPlPos){
       // mouse position change screen to world point
       Vector3 vMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
       vMousePos.y=0;
-      m_vPlDirection = (vMousePos-m_vPlPos).normalized; //Player direction
-      if((vMousePos-m_vPlPos).magnitude<0.1f){
+      m_vPlDirection = (vMousePos-vPlPos).normalized; //Player direction
+      if((vMousePos-vPlPos).magnitude<0.1f){
         m_fPlSpeed = c_fPlSpeedStop;
       }else{
         m_fPlSpeed = c_fPlSpeedMove;
@@ -87,11 +108,11 @@ public class PlayerController : MonoBehaviour
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //　@Brife : Setting the movable area of the player
-    private void _MovableRange(Vector3 m_vPlPos){
-      if(m_vPlPos.z>m_vMovableRangeZ.x){this.transform.position += new Vector3(0,0,-c_fElasticityMagnitude);}
-      if(m_vPlPos.z<m_vMovableRangeZ.y){this.transform.position += new Vector3(0,0,c_fElasticityMagnitude);}
-      if(m_vPlPos.x>m_vMovableRangeX.x){this.transform.position += new Vector3(-c_fElasticityMagnitude,0,0);}
-      if(m_vPlPos.x<m_vMovableRangeX.y){this.transform.position += new Vector3(c_fElasticityMagnitude,0,0);}
+    private void _MovableRange(Vector3 vPlPos){
+      if(vPlPos.z>m_vMovableRangeZ.x){this.transform.position += new Vector3(0,0,-c_fElasticityMagnitude);}
+      if(vPlPos.z<m_vMovableRangeZ.y){this.transform.position += new Vector3(0,0,c_fElasticityMagnitude);}
+      if(vPlPos.x>m_vMovableRangeX.x){this.transform.position += new Vector3(-c_fElasticityMagnitude,0,0);}
+      if(vPlPos.x<m_vMovableRangeX.y){this.transform.position += new Vector3(c_fElasticityMagnitude,0,0);}
     }
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -167,5 +188,6 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
       PlayerControllerUpdate();
+      
     }
 }

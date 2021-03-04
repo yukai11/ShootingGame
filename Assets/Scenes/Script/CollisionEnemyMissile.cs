@@ -21,9 +21,9 @@ public class CollisionEnemyMissile : MonoBehaviour
         player = GameObject.Find("Strl_Jager_MK1");
     }
 
-    private void CollisionColorChange(GameObject target,Material color){
+    private void _CollisionColorChange(GameObject target,Material pColor){
        for (int i =0; i<3; i++){
-           target.transform.GetChild(i).GetComponent<Renderer>().material= color;
+           target.transform.GetChild(i).GetComponent<Renderer>().material= pColor;
        }
    }
 
@@ -36,7 +36,7 @@ public class CollisionEnemyMissile : MonoBehaviour
             plCon.m_sHP -= 1;
             Debug.Log("プレイヤーのHPを表示します");
             Debug.Log(plCon.m_sHP);
-            CollisionColorChange(player,red);
+            _CollisionColorChange(player,red);
             Destroy(this.gameObject);
             }
    }

@@ -6,15 +6,29 @@ using UnityEngine;
 
 public class MissileController : MonoBehaviour
 {
+  
   private Vector3 missilePos; // Define missile position
   private Vector3 plDirection; //Player direction
-  public float missileSpeed = 0.1f; // Define missile position
+  public float missileSpeed; // Define missile position
+  public GameObject player;
+
+  public float m_fPlSpeed;
+
 
     void Start()
     {
+      try
+      {
+        m_fPlSpeed = player.GetComponent<PlayerController>().m_fPlSpeed;
+        Debug.Log(m_fPlSpeed);
+      }
+      catch
+      {
+         
+      }
       plDirection = this.transform.parent.forward;
       missilePos = this.transform.position;
-      this.transform.position += missileSpeed*plDirection; //Shift the initial position of the missile forward
+      this.transform.position += missileSpeed*plDirection + m_fPlSpeed*plDirection; //Shift the initial position of the missile forward
     }
 
     void Update()
@@ -22,7 +36,8 @@ public class MissileController : MonoBehaviour
       if (Mathf.Abs(this.transform.position.magnitude)>10){
         Destroy(this.gameObject);
       }
-       this.transform.position = missilePos + missileSpeed*plDirection;
+       //this.transform.position = missilePos + missileSpeed*plDirection + m_fPlSpeed*plDirection;
+       this.transform.position = missilePos + missileSpeed*plDirection + m_fPlSpeed*plDirection;
        missilePos = this.transform.position;
     }
 }
