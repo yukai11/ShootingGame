@@ -38,6 +38,7 @@ public class EnemyController : MonoBehaviour
 
     void Start()
     {
+        m_vEnemeyDirection = new Vector3(0,0,-1);
         m_pEnemyMissileList = world.GetComponent<GameController>().m_pEnemyMissileList;
         m_sHP = 1;
         //this.transform.position = new Vector3(0,5,0); //setting first position

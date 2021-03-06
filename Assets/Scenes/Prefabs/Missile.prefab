@@ -107,4 +107,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   missileSpeed: 0.1
-  player: {fileID: 0}
+  player: {fileID: 7961561248293447891, guid: 6a46ad184468e413ebad15533ef63ce0, type: 3}
+  m_fPlSpeed: 0

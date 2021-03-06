@@ -157,10 +157,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8146285a47244cba87fa24a7433eeea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HP: 0
-  speed: 0.05
+  m_sHP: 0
+  m_fSpeed: 0.05
   missile: {fileID: 7541982955401608347, guid: 25ebf25ba7504415081fa40350775be0, type: 3}
-  enemyMissileList: []
+  m_pEnemyMissileList: []
+  m_vEnemeyDirection: {x: 0, y: 0, z: 0}
+  m_fTimeElapsed: 0
+  m_fTimeOut: 1
   gmCon: {fileID: 0}
   world: {fileID: 7930342993881712730, guid: 532f6f52f32144f9cb451c8bcb4f8db5, type: 3}
 --- !u!1 &5735814581247766773

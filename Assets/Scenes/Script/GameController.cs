@@ -17,6 +17,7 @@ public class GameController : MonoBehaviour
 
     public PlayerController plCon;
     public EnemyController EnCon;
+    public bool m_pCreateCheck;　// if this is true, _CreateEnemy can create enemy gameobj
 
     private float m_fTimeOut;
     private float m_fTimeElapsed;
@@ -26,21 +27,23 @@ public class GameController : MonoBehaviour
     
 
     //CreateEnemy
-    private void _CreateEnemy(List<GameObject> pEnemyList){
-        Vector3 enPos = new Vector3(Random.Range(-2.0f,2.0f),0,5);
-        pEnemyList.Add(Instantiate(enemy,enPos,Quaternion.Euler(0,180,0)));
+    //pCreateCheck is true => it can enemy obj
+    private void _CreateEnemy(List<GameObject> pEnemyList,bool pCreateCheck){
+        if(pCreateCheck){
+            Vector3 enPos = new Vector3(Random.Range(-2.0f,2.0f),0,5);
+            pEnemyList.Add(Instantiate(enemy,enPos,Quaternion.Euler(0,180,0)));
         for(int i = pEnemyList.Count - 1; i > -1; i--)
       {
         if (pEnemyList[i] == null){pEnemyList.RemoveAt(i);}
       }
+        }
     }
 
 
    //---------------------------------------------------------------------------------------------------------------
-   //Function for hit judgment
+   //@Brife : Function for hit judgment
    //CollisionDetection(attacked things,attacker,Type of attack)
    //Currently, the missile and player hit judgment does not work, so other programs are used instead. Cause unknown. (study)
-
    　private void _CollisionDetection(List<GameObject> enemyList,List<GameObject> pMissileList,string pTarget){
        for (int i= enemyList.Count-1; i>-1; i--){
            if(enemyList[i] != null){
@@ -106,7 +109,7 @@ public class GameController : MonoBehaviour
         // Setting CreateEnemy interval
         m_fTimeElapsed += Time.deltaTime;
         if(m_fTimeElapsed >= m_fTimeOut){
-            _CreateEnemy(m_pEnemyList);
+            _CreateEnemy(m_pEnemyList,m_pCreateCheck);
             m_fTimeElapsed = 0.0f;
         }
         

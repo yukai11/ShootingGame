@@ -14,21 +14,19 @@ public class MissileController : MonoBehaviour
 
   public float m_fPlSpeed;
 
-
+    // Do not set the start position
     void Start()
     {
       try
       {
         m_fPlSpeed = player.GetComponent<PlayerController>().m_fPlSpeed;
-        Debug.Log(m_fPlSpeed);
       }
       catch
       {
-         
       }
       plDirection = this.transform.parent.forward;
       missilePos = this.transform.position;
-      this.transform.position += missileSpeed*plDirection + m_fPlSpeed*plDirection; //Shift the initial position of the missile forward
+      //this.transform.position += plDirection + m_fPlSpeed*plDirection; //Shift the initial position of the missile forward
     }
 
     void Update()
@@ -36,7 +34,6 @@ public class MissileController : MonoBehaviour
       if (Mathf.Abs(this.transform.position.magnitude)>10){
         Destroy(this.gameObject);
       }
-       //this.transform.position = missilePos + missileSpeed*plDirection + m_fPlSpeed*plDirection;
        this.transform.position = missilePos + missileSpeed*plDirection + m_fPlSpeed*plDirection;
        missilePos = this.transform.position;
     }

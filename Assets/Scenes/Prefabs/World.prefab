@@ -108,7 +108,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   enemy: {fileID: 5369100781554739447, guid: 5f8ed0581dce9431d83cdbfac0b11182, type: 3}
-  enemyMissileList:
+  m_pEnemyMissileList:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
@@ -125,14 +125,8 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  Material:
-  - {fileID: 0}
-  - {fileID: 0}
+  m_pMaterial:
+  - {fileID: 2100000, guid: ecd9797f9b89f417eaadac585a9843c5, type: 2}
+  - {fileID: 2100000, guid: 75b7f973ba23f4495b52fabedd6cd80b, type: 2}
   plCon: {fileID: 0}
   EnCon: {fileID: 0}
