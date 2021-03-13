@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
 
   // PLayer's missile
   public GameObject missile;
+  private MissileController MissileController;
   public List<GameObject> m_pMissileList = new List<GameObject>();
 
   // Player's Item
@@ -58,7 +59,7 @@ public class PlayerController : MonoBehaviour
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 　　//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    //@Brief : This function is to shoot a missile and control missils
+    //@Brief : This function is to shoot a missile and control missils (Parallel type)
     //vPlPos is player Position
     //missile is missile GameObject
     //sType number is missiles number
@@ -70,7 +71,27 @@ public class PlayerController : MonoBehaviour
       Vector3 vPlPos = player.transform.position;
       Vector3 vMissilePosDifference = 2 * new Vector3(m_vPlDirection.z,0,-m_vPlDirection.x);
       for(int i = 0; i<sType; i++){
-        GameObject msi = Instantiate(missile,vPlPos+i*vMissilePosDifference/(sType-1) - new Vector3(m_vPlDirection.z,0,-m_vPlDirection.x),Quaternion.identity,player.transform);
+        
+        //GameObject msi = Instantiate(missile,vPlPos+i*vMissilePosDifference/(sType-1) - new Vector3(m_vPlDirection.z,0,-m_vPlDirection.x),Quaternion.identity,player.transform);
+
+        GameObject msi = Instantiate(missile,vPlPos,Quaternion.identity,player.transform);
+        MissileController = msi.GetComponent<MissileController>();
+        msi.GetComponent<MissileController>().m_pDiffusionType = true;
+        Vector3 vNewMissileDirection;
+        if(this.transform.eulerAngles.y>=90){
+          vNewMissileDirection = new Vector3(
+          -Mathf.Sin(Mathf.Asin(-m_vPlDirection.x) + Mathf.PI*i/(sType-1) + Mathf.PI/2),
+          0,
+          Mathf.Cos(Mathf.Acos(m_vPlDirection.z) + Mathf.PI*i/(sType-1) + Mathf.PI/2)
+          );
+        }else{
+          vNewMissileDirection = new Vector3(
+          Mathf.Sin(Mathf.Asin(m_vPlDirection.x) + Mathf.PI*i/(sType-1) + Mathf.PI/2),
+          0,
+          Mathf.Cos(Mathf.Acos(m_vPlDirection.z) + Mathf.PI*i/(sType-1) + Mathf.PI/2)
+          );
+        }
+        msi.GetComponent<MissileController>().m_vMissileDirection = vNewMissileDirection;
         pMissileList.Add(msi);
       }
       for(int i = pMissileList.Count - 1; i > -1; i--) // clean m_pMissileList
@@ -100,9 +121,6 @@ public class PlayerController : MonoBehaviour
       catch 
       {
       }
-
-      
-
     }
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -193,6 +211,8 @@ public class PlayerController : MonoBehaviour
       float fAngle = this.transform.eulerAngles.y;
         if(Input.GetKey(KeyCode.D)|| Input.GetKey(KeyCode.RightArrow)){fAngle += c_fDeltaAngle;}
         if(Input.GetKey(KeyCode.A)|| Input.GetKey(KeyCode.LeftArrow)){fAngle -= c_fDeltaAngle;}
+        if(fAngle>90 && fAngle<180){fAngle-=5;}//Define movable player angle
+        if(fAngle<270 && fAngle>90){fAngle+=5;}//Define movable player angle
       this.transform.eulerAngles = new Vector3(0,fAngle,0);
       m_vPlDirection = new Vector3(Mathf.Sin(-Mathf.PI*fAngle/180),0,-Mathf.Cos(Mathf.PI*fAngle/180)).normalized;
     }
@@ -227,13 +247,7 @@ public class PlayerController : MonoBehaviour
       //_UseMousePosition(m_vPlPos);//create player speed
       _UseKeyBoardPosition();
       // Adjusting missile launch intervals
-      m_fTimeElapsed += Time.deltaTime;
-      if (Input.GetKey(KeyCode.Space)){
-        if(m_fTimeElapsed >= m_fTimeOut){
-            _ShootingMissileType2(this.gameObject,missile,m_pMissileList,m_sItemNum);
-            m_fTimeElapsed = 0.0f;
-        }
-      }
+      
       //Calculation of player position (flaot * Vector3)
       this.transform.position += m_fPlSpeed*m_vPlDirection; //　decision player position
       //_RotationPlayerUseMouse(); //Change direction of player
@@ -243,10 +257,21 @@ public class PlayerController : MonoBehaviour
       _MissileNumber(this.gameObject,m_pItemList);
       m_fItemTimeElapsed += Time.deltaTime;
       if(m_fItemTimeElapsed >= m_fItemTimeOut){
-        _CreateItem(AddMissleItem);
-        _CreateItem(RemoveMissleItem);
+        if(Random.Range(0,2)==0){
+          _CreateItem(AddMissleItem);
+        }else{
+          _CreateItem(RemoveMissleItem);
+        }
             m_fItemTimeElapsed = 0.0f;
         }
+
+        m_fTimeElapsed += Time.deltaTime;
+      if (Input.GetKey(KeyCode.Space)){
+        if(m_fTimeElapsed >= m_fTimeOut){
+            _ShootingMissileType2(this.gameObject,missile,m_pMissileList,m_sItemNum);
+            m_fTimeElapsed = 0.0f;
+        }
+      }
 
 
       _GameOver(); //game over message

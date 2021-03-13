@@ -8,7 +8,8 @@ public class MissileController : MonoBehaviour
 {
   
   private Vector3 missilePos; // Define missile position
-  private Vector3 plDirection; //Player direction
+  public Vector3 m_vMissileDirection; //Player direction
+  public bool m_pDiffusionType; // change type missile (true=>missile is changed)
   public float missileSpeed; // Define missile position
   public GameObject player;
 
@@ -24,9 +25,9 @@ public class MissileController : MonoBehaviour
       catch
       {
       }
-      plDirection = this.transform.parent.forward;
+      if(m_pDiffusionType==false){m_vMissileDirection = this.transform.parent.forward;}
       missilePos = this.transform.position;
-      //this.transform.position += plDirection + m_fPlSpeed*plDirection; //Shift the initial position of the missile forward
+      //this.transform.position += m_vMissileDirection + m_fPlSpeed*m_vMissileDirection; //Shift the initial position of the missile forward
     }
 
     void Update()
@@ -34,7 +35,8 @@ public class MissileController : MonoBehaviour
       if (Mathf.Abs(this.transform.position.magnitude)>10){
         Destroy(this.gameObject);
       }
-       this.transform.position = missilePos + missileSpeed*plDirection + m_fPlSpeed*plDirection;
+       //this.transform.position = missilePos + missileSpeed*m_vMissileDirection + m_fPlSpeed*m_vMissileDirection;
+       this.transform.position = missilePos + missileSpeed*m_vMissileDirection;
        missilePos = this.transform.position;
     }
 }
